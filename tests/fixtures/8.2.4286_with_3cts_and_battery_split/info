@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<envoy_info>
+  <time>1722966999</time>
+  <device>
+    <sn>123456789012</sn>
+    <pn>800-00664-r05</pn>
+    <software>D8.2.4286</software>
+    <euaid>4c8675</euaid>
+    <seqnum>0</seqnum>
+    <apiver>1</apiver>
+    <imeter>true</imeter>
+  </device>
+  <web-tokens>true</web-tokens>
+  <package name="rootfs">
+    <pn>500-00001-r01</pn>
+    <version>02.00.00</version>
+    <build>1211</build>
+  </package>
+  <package name="kernel">
+    <pn>500-00011-r02</pn>
+    <version>04.04.225</version>
+    <build>08bedf</build>
+  </package>
+  <package name="boot">
+    <pn>590-00019-r01</pn>
+    <version>02.00.01</version>
+    <build>1f421b</build>
+  </package>
+  <package name="app">
+    <pn>500-00002-r01</pn>
+    <version>08.02.4286</version>
+    <build>5f4d83</build>
+  </package>
+  <package name="devimg">
+    <pn>500-00004-r01</pn>
+    <version>01.02.488</version>
+    <build>c973ae</build>
+  </package>
+  <package name="geo">
+    <pn>500-00008-r01</pn>
+    <version>02.01.24</version>
+    <build>a74d96</build>
+  </package>
+  <package name="backbone">
+    <pn>500-00010-r01</pn>
+    <version>07.00.20</version>
+    <build>176d57</build>
+  </package>
+  <package name="meter">
+    <pn>500-00013-r01</pn>
+    <version>03.02.08</version>
+    <build>bc6548</build>
+  </package>
+  <package name="agf">
+    <pn>500-00012-r01</pn>
+    <version>02.02.00</version>
+    <build>bc6548</build>
+  </package>
+  <package name="essimg">
+    <pn>500-00020-r01</pn>
+    <version>31.33.36</version>
+    <build>c427b6</build>
+  </package>
+  <package name="security">
+    <pn>500-00016-r01</pn>
+    <version>02.00.00</version>
+    <build>54a6dc</build>
+  </package>
+  <package name="pkgsec">
+    <pn>500-00021-r01</pn>
+    <version>01.00.00</version>
+    <build>19ae14</build>
+  </package>
+  <package name="ffuimg">
+    <pn>500-00022-r01</pn>
+    <version>01.00.04</version>
+    <build>2cd3479</build>
+  </package>
+  <package name="patch">
+    <pn>500-00016-r01</pn>
+    <version>01.00.00</version>
+    <build>8</build>
+  </package>
+  <package name="full">
+    <pn>500-00001-r01</pn>
+    <version>02.00.00</version>
+    <build>1211</build>
+  </package>
+  <build_info>
+    <build_id>-envoy_uber-pkg_master:pkg-Jul-31-24-15:29:57</build_id>
+    <build_time_gmt>1722440021</build_time_gmt>
+    <release_ver>02.00.5388</release_ver>
+    <release_stage>700-GA</release_stage>
+  </build_info>
+</envoy_info>

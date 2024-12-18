@@ -1,0 +1,11 @@
+{
+    "admin_state": "unknown",
+    "oper_state": "open",
+    "admin_mode": 0,
+    "schedule": 0,
+    "start_soc": 100,
+    "stop_soc": -1,
+    "exc_on": 0,
+    "present": 0,
+    "type": 1
+}

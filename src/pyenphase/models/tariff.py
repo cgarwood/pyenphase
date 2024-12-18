@@ -72,6 +72,7 @@ class EnvoyStorageSettings:
     very_low_soc: int
     charge_from_grid: bool
     date: str | None
+    opt_schedules: bool | None
 
     @classmethod
     def from_api(cls, data: dict[str, Any]) -> EnvoyStorageSettings:
@@ -91,6 +92,8 @@ class EnvoyStorageSettings:
             charge_from_grid=data["charge_from_grid"],
             # Some firmware versions don't return date
             date=data.get("date"),
+            # opt_schedules was added in 8.2.42xx
+            opt_schedules=data.get("opt_schedules"),
         )
 
     def to_api(self) -> dict[str, Any]:
@@ -104,5 +107,8 @@ class EnvoyStorageSettings:
         }
         if self.date is not None:
             retval["date"] = self.date
+        # opt_schedules was added in 8.2.42xx
+        if self.opt_schedules is not None:
+            retval["opt_schedules"] = self.opt_schedules
 
         return retval

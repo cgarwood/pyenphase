@@ -1,0 +1,16 @@
+{
+    "headers": {
+        "server": "openresty/1.17.8.1",
+        "date": "Tue, 06 Aug 2024 17:56:47 GMT",
+        "content-type": "application/json",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "pragma": "no-cache",
+        "expires": "1",
+        "cache-control": "no-cache",
+        "strict-transport-security": "max-age=63072000; includeSubdomains",
+        "x-frame-options": "DENY",
+        "x-content-type-options": "nosniff"
+    },
+    "code": 200
+}

@@ -1,0 +1,20 @@
+{
+    "dry_contacts": [
+        {
+            "id": "NC1",
+            "status": "closed"
+        },
+        {
+            "id": "NC2",
+            "status": "closed"
+        },
+        {
+            "id": "NO1",
+            "status": "closed"
+        },
+        {
+            "id": "NO2",
+            "status": "closed"
+        }
+    ]
+}
