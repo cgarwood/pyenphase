@@ -302,6 +302,10 @@ async def test_no_remote_token_with_7_6_175_standard() -> None:
     with pytest.raises(EnvoyAuthenticationError):
         await envoy.authenticate("username", "password")
 
+    assert isinstance(envoy.auth, EnvoyTokenAuth)
+    with pytest.raises(EnvoyAuthenticationRequired):
+        assert envoy.auth.token_type == "owner"
+
 
 @pytest.mark.asyncio
 @respx.mock
@@ -342,13 +346,16 @@ async def test_token_with_7_6_175_standard() -> None:
     await envoy.setup()
 
     token = jwt.encode(
-        payload={"name": "envoy", "exp": 1707837780}, key="secret", algorithm="HS256"
+        payload={"name": "envoy", "exp": 1707837780, "enphaseUser": "owner"},
+        key="secret",
+        algorithm="HS256",
     )
 
     await envoy.authenticate("username", "password", token)
     assert isinstance(envoy.auth, EnvoyTokenAuth)
     assert envoy.auth.expire_timestamp == 1707837780
     assert envoy.auth.token == token
+    assert envoy.auth.token_type == "owner"
 
     # test cookies function now cookies are not on request
     assert envoy.auth.cookies == {}

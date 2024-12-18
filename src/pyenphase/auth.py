@@ -9,7 +9,7 @@ import orjson
 from tenacity import retry, retry_if_exception_type, wait_random_exponential
 
 from .const import LOCAL_TIMEOUT, URL_AUTH_CHECK_JWT
-from .exceptions import EnvoyAuthenticationError
+from .exceptions import EnvoyAuthenticationError, EnvoyAuthenticationRequired
 from .ssl import SSL_CONTEXT
 
 
@@ -232,6 +232,24 @@ class EnvoyTokenAuth(EnvoyAuth):
         jwt_payload = jwt.decode(self.token, options={"verify_signature": False})
         return cast(int, jwt_payload["exp"])
 
+    @property
+    def token_type(self) -> str:
+        """Return the enphase user type for the token.
+
+        Enlighten user accounts can be type 'owner' or 'installer'. Both
+        have access to the envoy base data. Installer has access to more
+        data and configuration setup.
+
+        :raises: EnvoyAuthenticationRequired if no prior authentication was done
+        :return: 'owner' or 'installer'
+        """
+        if not self._token:
+            raise EnvoyAuthenticationRequired(
+                "You must authenticate to the Envoy before inspecting token."
+            )
+        jwt_payload = jwt.decode(self.token, options={"verify_signature": False})
+        return jwt_payload["enphaseUser"]
+
     @retry(
         retry=retry_if_exception_type(
             (httpx.NetworkError, httpx.TimeoutException, httpx.RemoteProtocolError)
@@ -265,7 +283,16 @@ class EnvoyTokenAuth(EnvoyAuth):
 
     @property
     def manager_token(self) -> str:
-        """Return manager token returned in enligthen login json"""
+        """Return manager token returned in enligthen login json.
+
+        This property is only available if a token has been requested
+        from the Enlighten cloud. This is only the case if no token
+        was specified, or a token refresh was requested. If a valid
+        token with a future expiration time was specified this method
+        will assert.
+
+        :return: token string
+        """
         assert self._manager_token is not None  # nosec
         return self._manager_token
 
@@ -282,7 +309,18 @@ class EnvoyTokenAuth(EnvoyAuth):
 
     @property
     def is_consumer(self) -> bool:
-        """Return is_consumer state returned in enligthen login json"""
+        """Return is_consumer state returned in enligthen login json
+
+        This property is only available if a token has been requested
+        from the Enlighten cloud. This is only the case if no token
+        was specified, or a token refresh was requested. If a valid
+        token with a future expiration time was specified no login was
+        attempted and this method will return the default false.
+        If an installer account was used it will return false as well.
+
+        :return: true if enlighten login was performed and
+            used credentials are for consumer account, otherwise false
+        """
         return self._is_consumer
 
     @property
