@@ -7,15 +7,22 @@ from os import listdir
 from os.path import isfile, join
 from typing import Any
 
+import httpx
 import orjson
 import pytest
 import respx
 from httpx import Response
 from syrupy.assertion import SnapshotAssertion
 
-from pyenphase.const import URL_GRID_RELAY, URL_TARIFF, PhaseNames
+from pyenphase.const import (
+    URL_DRY_CONTACT_SETTINGS,
+    URL_DRY_CONTACT_STATUS,
+    URL_GRID_RELAY,
+    URL_TARIFF,
+    PhaseNames,
+)
 from pyenphase.envoy import EnvoyProbeFailed, SupportedFeatures
-from pyenphase.exceptions import EnvoyFeatureNotAvailable
+from pyenphase.exceptions import EnvoyError, EnvoyFeatureNotAvailable
 from pyenphase.models.dry_contacts import DryContactStatus
 from pyenphase.models.meters import CtMeterStatus, CtType, EnvoyPhaseMode
 from pyenphase.models.tariff import EnvoyStorageMode
@@ -1304,6 +1311,40 @@ async def test_with_7_x_firmware(
 
         assert "Sending POST" in caplog.text
 
+        # test error returned by action methods calling _json_request
+        respx.post(URL_GRID_RELAY).mock(return_value=Response(300, json={}))
+        with pytest.raises(EnvoyError):
+            await envoy.go_on_grid()
+        with pytest.raises(EnvoyError):
+            await envoy.go_off_grid()
+
+        respx.post(URL_GRID_RELAY).mock(
+            return_value=Response(200, json={})
+        ).side_effect = httpx.ConnectError("Test Connection error")
+        with pytest.raises(EnvoyError):
+            await envoy.go_on_grid()
+        respx.post(URL_GRID_RELAY).mock(
+            return_value=Response(200, json={})
+        ).side_effect = httpx.TimeoutException("Test timeout exception")
+        with pytest.raises(EnvoyError):
+            await envoy.go_off_grid()
+
+        respx.post(URL_DRY_CONTACT_SETTINGS).mock(return_value=Response(300, json={}))
+        with pytest.raises(EnvoyError):
+            await envoy.update_dry_contact(new_data)
+
+        respx.post(URL_DRY_CONTACT_STATUS).mock(
+            return_value=Response(200, json={})
+        ).side_effect = httpx.ConnectError("Test Connection error")
+        with pytest.raises(EnvoyError):
+            await envoy.close_dry_contact("NC1")
+
+        respx.post(URL_DRY_CONTACT_STATUS).mock(
+            return_value=Response(200, json={})
+        ).side_effect = httpx.TimeoutException("Test timeout exception")
+        with pytest.raises(EnvoyError):
+            await envoy.open_dry_contact("NC1")
+
     else:
         with pytest.raises(EnvoyFeatureNotAvailable):
             await envoy.go_off_grid()
@@ -1382,6 +1423,26 @@ async def test_with_7_x_firmware(
 
         with pytest.raises(TypeError):
             await envoy.set_storage_mode("invalid")
+
+        # test error returned by action methods calling _json_request
+        respx.put(URL_TARIFF).mock(return_value=Response(300, json={}))
+        with pytest.raises(EnvoyError):
+            await envoy.enable_charge_from_grid()
+        respx.put(URL_TARIFF).mock(return_value=Response(200, json={})).side_effect = (
+            httpx.TimeoutException("Test timeout exception")
+        )
+        with pytest.raises(EnvoyError):
+            await envoy.disable_charge_from_grid()
+        respx.put(URL_TARIFF).mock(return_value=Response(200, json={})).side_effect = (
+            httpx.ConnectError("Test Connection error")
+        )
+        with pytest.raises(EnvoyError):
+            await envoy.set_storage_mode(EnvoyStorageMode.SELF_CONSUMPTION)
+        respx.put(URL_TARIFF).mock(return_value=Response(200, json={})).side_effect = (
+            httpx.ConnectError("Test Connection error")
+        )
+        with pytest.raises(EnvoyError):
+            await envoy.set_reserve_soc(50)
 
         # COV test with missing logger
         json_data = load_json_fixture(version, "admin_lib_tariff")
