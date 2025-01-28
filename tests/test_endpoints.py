@@ -1250,6 +1250,29 @@ async def test_with_7_x_firmware(
     # pylint: disable=protected-access
     assert envoy._supported_features == supported_features
 
+    # test envoy request methods GET, PUT and POST
+    test_data = load_json_fixture(version, "api_v1_production_inverters")
+    respx.post("/api/v1/production/inverters").mock(
+        return_value=Response(200, json=test_data)
+    )
+    respx.put("/api/v1/production/inverters").mock(
+        return_value=Response(200, json=test_data)
+    )
+
+    # test request with just an endpoint, should be a GET
+    await envoy.request("/api/v1/production/inverters")
+    assert respx.calls.last.request.method == "GET"
+
+    # with data but no method should be post
+    await envoy.request("/api/v1/production/inverters", data=test_data)
+    assert respx.calls.last.request.method == "POST"
+
+    # with method should be specified method
+    await envoy.request("/api/v1/production/inverters", data=test_data, method="PUT")
+    assert respx.calls.last.request.method == "PUT"
+    await envoy.request("/api/v1/production/inverters", data=test_data, method="POST")
+    assert respx.calls.last.request.method == "POST"
+
     if supported_features & supported_features.ENPOWER:
         # switch off debug for one post to improve COV
         logging.getLogger("pyenphase").setLevel(logging.WARN)

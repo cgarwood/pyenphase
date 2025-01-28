@@ -292,7 +292,10 @@ class Envoy:
         reraise=True,
     )
     async def request(
-        self, endpoint: str, data: dict[str, Any] | None = None
+        self,
+        endpoint: str,
+        data: dict[str, Any] | None = None,
+        method: str | None = None,
     ) -> httpx.Response:
         """Make a request to the Envoy.
 
@@ -307,13 +310,16 @@ class Envoy:
         ever comes first.
 
         :param endpoint: Envoy Endpoint to access, start with leading /
-        :param data: data dictionary to send to the Envoy, defaults to None
+        :param data: optional data dictionary to send to the Envoy
+            Defaults to none, if none a GET request is issued.
+        :param method: HTTP method to use when sending data dictionary,
+            if none and data is specified POST is default
         :raises EnvoyAuthenticationRequired: if no prior authentication
             was completed or HTTP status 401 or 404 is returned.
         :raises: Any communication errors when retries are exceeded
         :return: request response.
         """
-        return await self._request(endpoint, data)
+        return await self._request(endpoint, data, method)
 
     async def _request(
         self,
